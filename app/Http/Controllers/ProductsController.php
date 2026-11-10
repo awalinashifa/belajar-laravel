@@ -4,18 +4,23 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Product;
+use App\Http\Resources\ProductResource;
 
 class ProductsController extends Controller
 {
+
     public function index(Request $request)
     {
+        $perPage = min($request->integer('per_page', 10), 50);
         $search = $request->query('search');
 
-        $data = Product::when($search, function ($query) use ($search) {
+        $products = Product::when($search, function ($query) use ($search) {
             $query->where('name', 'like', '%' . $search . '%');
-        })->get();
+        })
+            ->latest()
+            ->paginate($perPage);
 
-        return response()->json($data);
+        return ProductResource::collection($products);
     }
 
     public function create()
@@ -26,13 +31,19 @@ class ProductsController extends Controller
     public function store(Request $request)
     {
         $data = Product::create($request->all());
-        return response()->json($data, 201);
+
+        return new ProductResource($data);
     }
 
-    public function show(string $id)
+    public function restore(string $id)
     {
-        $data = Product::find($id);
-        return response()->json($data);
+        $data = Product::withTrashed()->findOrFail($id);
+        $data->restore();
+
+        return response()->json([
+            'message' => 'Produk berhasil dipulihkan',
+            'data' => new ProductResource($data)
+        ]);
     }
 
     public function edit(string $id)
@@ -59,18 +70,7 @@ class ProductsController extends Controller
     {
         $data = Product::onlyTrashed()->get();
 
-        return response()->json($data);
-    }
-    
-    public function restore(string $id)
-    {
-        $data = Product::withTrashed()->findOrFail($id);
-        $data->restore();
-
-        return response()->json([
-            'message' => 'Produk berhasil dipulihkan',
-            'data' => $data
-        ]);
+        return ProductResource::collection($data);
     }
 
 }
