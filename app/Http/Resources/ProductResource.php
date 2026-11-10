@@ -15,13 +15,12 @@ class ProductResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-
+            'id' => $this->id,
             'sku' => $this->sku,
-            'name' => $this->nama,
-            'price' => $this->harga,
-            'price_format' => 'Rp '.number_format(
-                $this->harga, 0, ',', '.'),
-            'stock' => $this->stok,
+            'name' => $this->name,
+            'price' => $this->price,
+            'price_format' => 'Rp'.number_format(
+                $this->price, 0, ',', '.'),
             'created_at' => $this->created_at
                 ->format('d-m-Y'),
         ];
