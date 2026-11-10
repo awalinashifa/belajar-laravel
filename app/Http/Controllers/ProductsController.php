@@ -82,7 +82,7 @@ class ProductsController extends Controller
         return response()->json([
             'message' => 'Produk berhasil dihapus'
         ]);
-    }
+}
 
     public function trashed()
     {
