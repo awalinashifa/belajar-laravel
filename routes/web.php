@@ -1,8 +1,10 @@
 <?php
 
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProductWebController;
 use Illuminate\Support\Facades\Route;
 
+Route::resource('produk', ProductWebController::class);
 Route ::resource('products', ProductController::class);
 
 Route::get('/', function () {
