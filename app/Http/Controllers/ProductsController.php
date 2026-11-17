@@ -13,9 +13,11 @@ class ProductsController extends Controller
         $perPage = min($request->integer('per_page', 10), 50);
         $search = $request->query('search');
 
-        $products = Product::when($search, function ($query) use ($search) {
-            $query->where('name', 'like', '%'.$search.'%');
-        })
+        $products = Product::query()
+            ->with('category')
+            ->when($search, function ($query) use ($search) {
+                return $query->where('name', 'like', '%'.$search.'%');
+            })
             ->latest()
             ->paginate($perPage);
 
